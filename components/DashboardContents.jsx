@@ -4,34 +4,48 @@ import Link from "next/link";
 import { FiPlus } from "react-icons/fi";
 import { IoMdMenu } from "react-icons/io";
 import { db } from "@/lib/firebase.config";
-import { collection, getDocs } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
 
-const DashboardContents = () => {
+const DashboardContents = ({ session }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [tasks, setTasks] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const fetchTasks = async () => {
-      const snapshot = await getDocs(collection(db, "tasks"));
-      const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      setTasks(data);
+      if (!session?.user?.id) return;
+
+      try {
+        const q = query(
+          collection(db, "tasks"),
+          where("userId", "==", session.user.id)
+        );
+        const snapshot = await getDocs(q);
+        const data = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setTasks(data);
+      } catch (error) {
+        console.error("Error fetching tasks:", error);
+      }
     };
 
     fetchTasks();
-  }, []);
+  }, [session]);
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const isSameDay = (date1, date2) => {
-  return (
+  const isSameDay = (date1, date2) =>
     date1.getFullYear() === date2.getFullYear() &&
     date1.getMonth() === date2.getMonth() &&
-    date1.getDate() === date2.getDate()
-  );
-};
-
+    date1.getDate() === date2.getDate();
 
   const filteredTasks = tasks.filter((task) =>
     task.title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -44,14 +58,11 @@ const DashboardContents = () => {
         isSameDay(new Date(t.due), today)
     ).length,
     overdue: filteredTasks.filter((t) => {
-    if (t.status !== "Pending" || !t.due) return false;
-
-    const taskDate = new Date(t.due);
-    taskDate.setHours(0, 0, 0, 0); // normalize to midnight
-
-    return taskDate.getTime() < today.getTime();
+      if (t.status !== "Pending" || !t.due) return false;
+      const taskDate = new Date(t.due);
+      taskDate.setHours(0, 0, 0, 0);
+      return taskDate.getTime() < today.getTime();
     }).length,
-
     completed: filteredTasks.filter((t) => t.status === "Completed").length,
     pending: filteredTasks.filter((t) => t.status === "Pending").length,
     nextDue: filteredTasks
@@ -61,7 +72,7 @@ const DashboardContents = () => {
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-gradient-to-r from-gray-50 to-blue-100 relative">
-      {/* desktop Sidebar */}
+      {/* Sidebar */}
       <div className="hidden md:block md:w-64 bg-white p-4 shadow-md">
         <Link href="/">
           <h2 className="text-2xl font-bold mb-6 border-b border-gray-800 text-gray-800">
@@ -84,7 +95,7 @@ const DashboardContents = () => {
         </nav>
       </div>
 
-      {/* mobile Sidebar */}
+      {/* Mobile Sidebar */}
       <div
         className={`fixed top-0 right-0 h-full w-64 bg-white shadow-lg p-4 transform transition-transform
          z-40 md:hidden ${menuOpen ? "translate-x-0" : "translate-x-full"}`}
@@ -126,7 +137,7 @@ const DashboardContents = () => {
 
       {/* Content */}
       <main className="w-full p-4 sm:p-6 flex flex-col space-y-6">
-        {/* search  */}
+        {/* Search */}
         <div className="flex justify-between items-center gap-3 md:gap-6 mb-4">
           <input
             type="text"
@@ -144,7 +155,7 @@ const DashboardContents = () => {
           </button>
         </div>
 
-        {/* Overview card */}
+        {/* Overview Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="bg-white p-4 rounded-lg shadow-sm">
             <p className="text-gray-500">Tasks Due Today</p>
@@ -166,7 +177,7 @@ const DashboardContents = () => {
           </div>
         </div>
 
-        {/* Upcoming task */}
+        {/* Upcoming Tasks */}
         <div className="space-y-4">
           <div className="flex justify-between items-center">
             <h4 className="text-xl font-semibold text-gray-800">
@@ -207,16 +218,12 @@ const DashboardContents = () => {
           </ul>
         </div>
 
-        {/* task Summary */}
+        {/* Task Summary */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="bg-white p-4 rounded-lg shadow-sm">
             <p className="text-gray-600">Total Tasks: {filteredTasks.length}</p>
-            <p className="text-gray-600">
-              Pending: {statusCounts.pending}
-            </p>
-            <p className="text-gray-600">
-              Completed: {statusCounts.completed}
-            </p>
+            <p className="text-gray-600">Pending: {statusCounts.pending}</p>
+            <p className="text-gray-600">Completed: {statusCounts.completed}</p>
             <p className="text-gray-600">Overdue: {statusCounts.overdue}</p>
           </div>
           <div className="bg-white p-4 rounded-lg shadow-sm">

@@ -5,44 +5,61 @@ import { FiPlus } from "react-icons/fi";
 import { IoMdMenu } from "react-icons/io";
 import { MdDelete } from "react-icons/md";
 import { db } from "@/lib/firebase.config";
-import { collection, getDocs, deleteDoc, doc, updateDoc } from "firebase/firestore";
+import { collection, getDocs, deleteDoc, doc, updateDoc, query, where,} from "firebase/firestore";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 const MyTasksContents = () => {
   const [myTasks, setMyTasks] = useState([]);
   const [filter, setFilter] = useState("All");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [userId, setUserId] = useState(null);
+
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUserId(user.uid);
+      } else {
+        setUserId(null);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   const fetchTasks = async () => {
-    const querySnapshot = await getDocs(collection(db, "tasks"));
-    const now = new Date();
+    if (!userId) return;
+
+    const q = query(collection(db, "tasks"), where("userId", "==", userId));
+    const querySnapshot = await getDocs(q);
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
     const tasks = await Promise.all(
       querySnapshot.docs.map(async (docSnap) => {
         const data = docSnap.data();
         const dueDate = new Date(data.due);
+        dueDate.setHours(0, 0, 0, 0);
 
-       
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  dueDate.setHours(0, 0, 0, 0);
-
-  if (data.status === "Pending" && dueDate.getTime() < today.getTime()) {
-    await updateDoc(doc(db, "tasks", docSnap.id), {
-      status: "Overdue",
-    });
-    return { id: docSnap.id, ...data, status: "Overdue" };
-  }
-
+        if (data.status === "Pending" && dueDate.getTime() < today.getTime()) {
+          await updateDoc(doc(db, "tasks", docSnap.id), {
+            status: "Overdue",
+          });
+          return { id: docSnap.id, ...data, status: "Overdue" };
+        }
 
         return { id: docSnap.id, ...data };
       })
     );
+
     setMyTasks(tasks);
   };
 
   useEffect(() => {
-    fetchTasks();
-  }, []);
+    if (userId) {
+      fetchTasks();
+    }
+  }, [userId]);
 
   const handleDelete = async (taskId) => {
     await deleteDoc(doc(db, "tasks", taskId));
@@ -57,6 +74,7 @@ const MyTasksContents = () => {
 
   const filteredTasks =
     filter === "All" ? myTasks : myTasks.filter((task) => task.status === filter);
+
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-gradient-to-r from-gray-50 to-blue-100 relative">

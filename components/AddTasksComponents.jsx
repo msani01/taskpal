@@ -27,15 +27,15 @@ const AddTaskComponent = ({ session }) => {
   };
 
   const validationSchema = Yup.object({
-  title: Yup.string().required("Task title is required"),
-  description: Yup.string().required("Description is required"),
-  due: Yup.date()
-    .transform((value, originalValue) =>
-      originalValue ? new Date(originalValue) : null
-    )
-    .required("Due date is required")
-    .min(startOfToday(), "Unable to add a task to the past."),
-});
+    title: Yup.string().required("Task title is required"),
+    description: Yup.string().required("Description is required"),
+    due: Yup.date()
+      .transform((value, originalValue) =>
+        originalValue ? new Date(originalValue) : null
+      )
+      .required("Due date is required")
+      .min(startOfToday(), "Unable to add a task to the past."),
+  });
 
   const handleSubmit = async (values, { resetForm }) => {
     if (!uid || !author) {
@@ -49,7 +49,7 @@ const AddTaskComponent = ({ session }) => {
         ...values,
         createdAt: new Date().toISOString(),
         author,
-        authorId: uid,
+        userId: uid, 
       };
       await addDoc(collection(db, "tasks"), taskData);
       setShowModal(true);
@@ -62,8 +62,7 @@ const AddTaskComponent = ({ session }) => {
     }
   };
 
-  // today's date in yyyy-mm-dd format for input min attribute
-  const today = new Date().toISOString().split("T")[0];
+  const today = new Date().toISOString().split("T")[0]; // yyyy-mm-dd
 
   return (
     <div>

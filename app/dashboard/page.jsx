@@ -10,8 +10,7 @@ const page = async () => {
   if (!session) {
     redirect("/auth/signin");
   }
-
-  return <DashboardContents/>;
+  return <DashboardContents session={session}/>;
 };
 
 export default page;
