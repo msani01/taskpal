@@ -23,12 +23,11 @@ const MyTasksContents = () => {
   const [userId, setUserId] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Listen for auth state and get user ID
+  // Detect auth state and set user ID
   useEffect(() => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        console.log("User UID:", user.uid);
         setUserId(user.uid);
       } else {
         setUserId(null);
@@ -38,22 +37,21 @@ const MyTasksContents = () => {
     return () => unsubscribe();
   }, []);
 
-  // Fetch tasks for the logged-in user
+  // Fetch tasks for logged-in user
   const fetchTasks = async () => {
     if (!userId) return;
-
     try {
-      console.log("Fetching tasks for userId:", userId);
       const q = query(collection(db, "tasks"), where("userId", "==", userId));
       const snapshot = await getDocs(q);
-
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
       const tasks = await Promise.all(
         snapshot.docs.map(async (docSnap) => {
           const data = docSnap.data();
-          const dueDate = data.due?.toDate ? data.due.toDate() : new Date(data.due);
+          const dueDate = data.due?.toDate
+            ? data.due.toDate()
+            : new Date(data.due);
           dueDate.setHours(0, 0, 0, 0);
 
           let updatedStatus = data.status;
@@ -109,32 +107,26 @@ const MyTasksContents = () => {
       >
         <div className="flex flex-col space-y-4">
           <Link href={"/"} className="mb-5">
-            <h1 className="text-2xl font-semibold text-gray-800 border-b border-gray-800">TaskPal</h1>
+            <h1 className="text-2xl font-semibold text-gray-800 border-b border-gray-800">
+              TaskPal
+            </h1>
           </Link>
-          <Link href={"/dashboard"} className="text-gray-800 hover:text-blue-600">Dashboard</Link>
-          <Link href={"/mytasks"} className="text-blue-600 font-semibold">My Tasks</Link>
-          <Link href={"/calendar"} className="text-gray-800 hover:text-blue-600">Calendar</Link>
-          <Link href={"#"} className="text-gray-800 hover:text-blue-600">Settings</Link>
+          <Link href={"/dashboard"} className="text-gray-800 hover:text-blue-600">
+            Dashboard
+          </Link>
+          <Link href={"/mytasks"} className="text-blue-600 font-semibold">
+            My Tasks
+          </Link>
+          <Link href={"/calendar"} className="text-gray-800 hover:text-blue-600">
+            Calendar
+          </Link>
+          <Link href={"#"} className="text-gray-800 hover:text-blue-600">
+            Settings
+          </Link>
         </div>
       </div>
 
-      {/* Header */}
-      <div className="flex justify-between items-center gap-2 p-4 md:hidden">
-        <input
-          type="text"
-          placeholder="Search tasks..."
-          className="w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm 
-          focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600"
-        />
-        <button
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="md:hidden p-2 bg-gray-800 rounded text-white shadow-md"
-        >
-          <IoMdMenu size={26} />
-        </button>
-      </div>
-
-      {/* Main */}
+      {/* Main Content */}
       <main className="w-full p-4 sm:p-6 flex flex-col space-y-6">
         <div className="flex items-center justify-between flex-wrap">
           <h1 className="text-2xl font-semibold text-gray-800">My Tasks</h1>
@@ -147,12 +139,14 @@ const MyTasksContents = () => {
 
         {/* Filters */}
         <div className="flex flex-wrap gap-2">
-          {["All", "Pending", "Completed", "Overdue"].map((status) => (
+          {"All Pending Completed Overdue".split(" ").map((status) => (
             <button
               key={status}
               onClick={() => setFilter(status)}
               className={`px-4 py-1 rounded border ${
-                filter === status ? "bg-blue-600 text-white" : "bg-white text-gray-700"
+                filter === status
+                  ? "bg-blue-600 text-white"
+                  : "bg-white text-gray-700"
               }`}
             >
               {status}
@@ -160,7 +154,7 @@ const MyTasksContents = () => {
           ))}
         </div>
 
-        {/* Task List */}
+        {/* Task Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {loading ? (
             <p className="text-center text-gray-500 col-span-full">Loading...</p>
