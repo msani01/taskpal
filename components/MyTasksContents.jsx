@@ -23,6 +23,7 @@ const MyTasksContents = () => {
   const [userId, setUserId] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Listen for auth state
   useEffect(() => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -36,37 +37,37 @@ const MyTasksContents = () => {
     return () => unsubscribe();
   }, []);
 
+  // Fetch user-specific tasks
   const fetchTasks = async () => {
     if (!userId) return;
-
     try {
       const q = query(collection(db, "tasks"), where("userId", "==", userId));
-      const querySnapshot = await getDocs(q);
-
+      const snapshot = await getDocs(q);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
       const tasks = await Promise.all(
-        querySnapshot.docs.map(async (docSnap) => {
+        snapshot.docs.map(async (docSnap) => {
           const data = docSnap.data();
-
-          // Convert Firestore Timestamp to JS Date
-          let dueDate = new Date();
-          if (data.due?.toDate) {
-            dueDate = data.due.toDate();
-          } else {
-            dueDate = new Date(data.due);
-          }
+          const dueDate = data.due?.toDate
+            ? data.due.toDate()
+            : new Date(data.due);
           dueDate.setHours(0, 0, 0, 0);
 
-          if (data.status === "Pending" && dueDate.getTime() < today.getTime()) {
+          let updatedStatus = data.status;
+          if (updatedStatus === "Pending" && dueDate < today) {
+            updatedStatus = "Overdue";
             await updateDoc(doc(db, "tasks", docSnap.id), {
               status: "Overdue",
             });
-            return { id: docSnap.id, ...data, status: "Overdue", due: dueDate.toDateString() };
           }
 
-          return { id: docSnap.id, ...data, due: dueDate.toDateString() };
+          return {
+            id: docSnap.id,
+            ...data,
+            due: dueDate.toDateString(),
+            status: updatedStatus,
+          };
         })
       );
 
@@ -77,9 +78,7 @@ const MyTasksContents = () => {
   };
 
   useEffect(() => {
-    if (userId) {
-      fetchTasks();
-    }
+    if (userId) fetchTasks();
   }, [userId]);
 
   const handleDelete = async (taskId) => {
@@ -94,7 +93,9 @@ const MyTasksContents = () => {
   };
 
   const filteredTasks =
-    filter === "All" ? myTasks : myTasks.filter((task) => task.status === filter);
+    filter === "All"
+      ? myTasks
+      : myTasks.filter((task) => task.status === filter);
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-gradient-to-r from-gray-50 to-blue-100 relative">
@@ -105,27 +106,37 @@ const MyTasksContents = () => {
         } md:relative md:translate-x-0 md:block md:h-auto`}
       >
         <div className="flex flex-col space-y-4">
-          <Link href={"/"} className="mb-5">
-            <h1 className="text-2xl font-semibold text-gray-800 border-b border-gray-800">TaskPal</h1>
+          <Link href="/" className="mb-5">
+            <h1 className="text-2xl font-semibold text-gray-800 border-b border-gray-800">
+              TaskPal
+            </h1>
           </Link>
-          <Link href={"/dashboard"} className="text-gray-800 hover:text-blue-600">Dashboard</Link>
-          <Link href={"/mytasks"} className="text-blue-600 font-semibold">My Tasks</Link>
-          <Link href={"/calendar"} className="text-gray-800 hover:text-blue-600">Calendar</Link>
-          <Link href={"#"} className="text-gray-800 hover:text-blue-600">Settings</Link>
+          <Link href="/dashboard" className="text-gray-800 hover:text-blue-600">
+            Dashboard
+          </Link>
+          <Link href="/mytasks" className="text-blue-600 font-semibold">
+            My Tasks
+          </Link>
+          <Link href="/calendar" className="text-gray-800 hover:text-blue-600">
+            Calendar
+          </Link>
+          <Link href="#" className="text-gray-800 hover:text-blue-600">
+            Settings
+          </Link>
         </div>
       </div>
 
-      {/* Search and Menu Toggle */}
+      {/* Mobile Header */}
       <div className="flex justify-between items-center gap-2 p-4 md:hidden">
         <input
           type="text"
           placeholder="Search tasks..."
           className="w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm 
-          focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600"
+            focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600"
         />
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="md:hidden p-2 bg-gray-800 rounded text-white shadow-md"
+          className="p-2 bg-gray-800 rounded text-white shadow-md"
         >
           <IoMdMenu size={26} />
         </button>
@@ -142,14 +153,16 @@ const MyTasksContents = () => {
           </Link>
         </div>
 
-        {/* Filters */}
+        {/* Filter Buttons */}
         <div className="flex flex-wrap gap-2">
-          {"All Pending Completed Overdue".split(" ").map((status) => (
+          {["All", "Pending", "Completed", "Overdue"].map((status) => (
             <button
               key={status}
               onClick={() => setFilter(status)}
               className={`px-4 py-1 rounded border ${
-                filter === status ? "bg-blue-600 text-white" : "bg-white text-gray-700"
+                filter === status
+                  ? "bg-blue-600 text-white"
+                  : "bg-white text-gray-700"
               }`}
             >
               {status}
@@ -157,12 +170,14 @@ const MyTasksContents = () => {
           ))}
         </div>
 
-        {/* Task List */}
+        {/* Task Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {loading ? (
             <p className="text-center text-gray-500 col-span-full">Loading...</p>
           ) : filteredTasks.length === 0 ? (
-            <p className="text-center text-gray-500 col-span-full">No tasks to show.</p>
+            <p className="text-center text-gray-500 col-span-full">
+              No tasks to show.
+            </p>
           ) : (
             filteredTasks.map((task) => (
               <div
@@ -175,8 +190,14 @@ const MyTasksContents = () => {
                 >
                   <MdDelete size={20} />
                 </button>
-                <h3 className="text-lg font-semibold mb-2 text-gray-800">{task.title}</h3>
-                {task.description && <p className="text-sm text-gray-600 mb-4">{task.description}</p>}
+                <h3 className="text-lg font-semibold mb-2 text-gray-800">
+                  {task.title}
+                </h3>
+                {task.description && (
+                  <p className="text-sm text-gray-600 mb-4">
+                    {task.description}
+                  </p>
+                )}
                 <div className="flex justify-between items-center text-sm text-gray-500 mt-auto">
                   <span>Due: {task.due}</span>
                   <span
