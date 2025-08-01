@@ -5,7 +5,16 @@ import { FiPlus } from "react-icons/fi";
 import { IoMdMenu } from "react-icons/io";
 import { MdDelete } from "react-icons/md";
 import { db } from "@/lib/firebase.config";
-import { collection, getDocs, deleteDoc, doc, updateDoc } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  deleteDoc,
+  doc,
+  updateDoc,
+  query,
+  where,
+} from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 
 const MyTasksContents = () => {
   const [myTasks, setMyTasks] = useState([]);
@@ -13,30 +22,37 @@ const MyTasksContents = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const fetchTasks = async () => {
-    const querySnapshot = await getDocs(collection(db, "tasks"));
-    const now = new Date();
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    if (!user) {
+      console.error("User not authenticated.");
+      return;
+    }
+
+    const q = query(collection(db, "tasks"), where("userId", "==", user.uid));
+    const querySnapshot = await getDocs(q);
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
     const tasks = await Promise.all(
       querySnapshot.docs.map(async (docSnap) => {
         const data = docSnap.data();
         const dueDate = new Date(data.due);
+        dueDate.setHours(0, 0, 0, 0);
 
-       
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  dueDate.setHours(0, 0, 0, 0);
-
-  if (data.status === "Pending" && dueDate.getTime() < today.getTime()) {
-    await updateDoc(doc(db, "tasks", docSnap.id), {
-      status: "Overdue",
-    });
-    return { id: docSnap.id, ...data, status: "Overdue" };
-  }
-
+        if (data.status === "Pending" && dueDate.getTime() < today.getTime()) {
+          await updateDoc(doc(db, "tasks", docSnap.id), {
+            status: "Overdue",
+          });
+          return { id: docSnap.id, ...data, status: "Overdue" };
+        }
 
         return { id: docSnap.id, ...data };
       })
     );
+
     setMyTasks(tasks);
   };
 
