@@ -61,7 +61,8 @@ const page = () => {
               </p>
             </div>
             <div className="p-6 bg-white rounded-lg shadow-sm">
-              <h3 className="text-xl font-semibold mb-2">📆 Calendar View</h3>
+              <h3 className="text-xl font-semibold mb-2">📆 Calendar View
+                <span className='text-sm text-gray-800 ml-0.5'>(In Progress)</span></h3>
               <p className="text-gray-600">
                 Visualize your tasks by day, week, or month. Never miss a deadline again.
               </p>
