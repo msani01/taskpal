@@ -13,7 +13,7 @@ const MyTasksContents = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const fetchTasks = async () => {
-    const querySnapshot = await getDocs(collection(db, "tasks"));
+    const querySnapshot = await getDocs(collection(db, "tasks", userId));
     const now = new Date();
     const tasks = await Promise.all(
       querySnapshot.docs.map(async (docSnap) => {
