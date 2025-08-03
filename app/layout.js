@@ -1,6 +1,9 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+<<<<<<< HEAD
 import { SessionProvider } from "next-auth/react";
+=======
+>>>>>>> parent of 65da530 (taskpal)
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,10 +26,14 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+<<<<<<< HEAD
         <SessionProvider>
           {children}
         </SessionProvider>
         
+=======
+        {children}
+>>>>>>> parent of 65da530 (taskpal)
       </body>
     </html>
   );
