@@ -29,8 +29,10 @@ const MyTasksContents = () => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setUserId(user.uid);
+        console.log("Logged in as:", user.uid);
       } else {
         setUserId(null);
+        console.log("User not logged in");
       }
       setLoading(false);
     });
@@ -39,9 +41,16 @@ const MyTasksContents = () => {
 
   // Fetch tasks for logged-in user
   const fetchTasks = async () => {
-    if (!userId) return;
+    if (!userId) {
+      console.warn("No user ID found, skipping fetch.");
+      return;
+    }
+
     try {
+      // You can comment this filter out if testing all tasks
       const q = query(collection(db, "tasks"), where("userId", "==", userId));
+      // const q = query(collection(db, "tasks")); // <-- for testing only
+
       const snapshot = await getDocs(q);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -49,10 +58,16 @@ const MyTasksContents = () => {
       const tasks = await Promise.all(
         snapshot.docs.map(async (docSnap) => {
           const data = docSnap.data();
-          const dueDate = data.due?.toDate
-            ? data.due.toDate()
-            : new Date(data.due);
-          dueDate.setHours(0, 0, 0, 0);
+          let dueDate = new Date();
+
+          try {
+            dueDate = data.due?.toDate
+              ? data.due.toDate()
+              : new Date(data.due);
+            dueDate.setHours(0, 0, 0, 0);
+          } catch (err) {
+            console.warn("Invalid due date:", data.due);
+          }
 
           let updatedStatus = data.status;
           if (updatedStatus === "Pending" && dueDate < today) {
@@ -71,15 +86,19 @@ const MyTasksContents = () => {
         })
       );
 
+      console.log("Tasks fetched:", tasks);
       setMyTasks(tasks);
     } catch (error) {
       console.error("Error fetching tasks:", error);
     }
   };
 
+  // Trigger fetch when userId is ready
   useEffect(() => {
-    if (userId) fetchTasks();
-  }, [userId]);
+    if (!loading && userId) {
+      fetchTasks();
+    }
+  }, [userId, loading]);
 
   const handleDelete = async (taskId) => {
     await deleteDoc(doc(db, "tasks", taskId));
