@@ -62,7 +62,7 @@ const AddTaskComponent = ({ session }) => {
     }
   };
 
-  const today = new Date().toISOString().split("T")[0]; // yyyy-mm-dd
+  const today = new Date().toISOString().split("T")[0];
 
   return (
     <div>
@@ -130,7 +130,7 @@ const AddTaskComponent = ({ session }) => {
         </Formik>
       </section>
 
-      {/* Success Modal */}
+      {/* success message */}
       {showModal && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
           <div className="bg-white w-[90%] max-w-md p-6 rounded shadow relative text-center">

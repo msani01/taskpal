@@ -6,9 +6,10 @@ import { IoMdMenu } from "react-icons/io";
 import { db } from "@/lib/firebase.config";
 import {
   collection,
-  getDocs,
+  onSnapshot,
   query,
   where,
+  orderBy,
 } from "firebase/firestore";
 
 const DashboardContents = ({ session }) => {
@@ -17,28 +18,29 @@ const DashboardContents = ({ session }) => {
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    const fetchTasks = async () => {
-      if (!session?.user?.id) return;
+    if (!session?.user?.uid) return;
 
-      try {
-        const q = query(
-          collection(db, "tasks"),
-          where("userId", "==", session.user.id)
-        );
-        const snapshot = await getDocs(q);
-        const data = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setTasks(data);
-      } catch (error) {
-        console.error("Error fetching tasks:", error);
-      }
-    };
+    // Query tasks for the logged-in user only, ordered by due date
+    const q = query(
+      collection(db, "tasks"),
+      where("userId", "==", session.user.uid),
+      orderBy("due", "asc")
+    );
 
-    fetchTasks();
+    // update listener for tasks immediately
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const data = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setTasks(data);
+    });
+
+    // Cleanup listener when deleted
+    return () => unsubscribe();
   }, [session]);
 
+  // dates handling
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -47,14 +49,17 @@ const DashboardContents = ({ session }) => {
     date1.getMonth() === date2.getMonth() &&
     date1.getDate() === date2.getDate();
 
+  // filter task by search inputed
   const filteredTasks = tasks.filter((task) =>
     task.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  //calculate task statistics
   const statusCounts = {
     todayCount: filteredTasks.filter(
       (t) =>
         t.status === "Pending" &&
+        t.due &&
         isSameDay(new Date(t.due), today)
     ).length,
     overdue: filteredTasks.filter((t) => {
@@ -66,14 +71,14 @@ const DashboardContents = ({ session }) => {
     completed: filteredTasks.filter((t) => t.status === "Completed").length,
     pending: filteredTasks.filter((t) => t.status === "Pending").length,
     nextDue: filteredTasks
-      .filter((t) => t.status === "Pending" && new Date(t.due) >= today)
+      .filter((t) => t.status === "Pending" && t.due && new Date(t.due) >= today)
       .sort((a, b) => new Date(a.due) - new Date(b.due))[0],
   };
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-gradient-to-r from-gray-50 to-blue-100 relative">
-      {/* Sidebar */}
-      <div className="hidden md:block md:w-64 bg-white p-4 shadow-md">
+      {/* sidebar */}
+      <div className="hidden md:block md:w-64 bg-white p-4 shadow-md absolute">
         <Link href="/">
           <h2 className="text-2xl font-bold mb-6 border-b border-gray-800 text-gray-800">
             TaskPal
@@ -95,7 +100,7 @@ const DashboardContents = ({ session }) => {
         </nav>
       </div>
 
-      {/* Mobile Sidebar */}
+      {/* mobile sidebar */}
       <div
         className={`fixed top-0 right-0 h-full w-64 bg-white shadow-lg p-4 transform transition-transform
          z-40 md:hidden ${menuOpen ? "translate-x-0" : "translate-x-full"}`}
@@ -135,9 +140,8 @@ const DashboardContents = ({ session }) => {
         </nav>
       </div>
 
-      {/* Content */}
+      {/* content */}
       <main className="w-full p-4 sm:p-6 flex flex-col space-y-6">
-        {/* Search */}
         <div className="flex justify-between items-center gap-3 md:gap-6 mb-4">
           <input
             type="text"
@@ -155,7 +159,7 @@ const DashboardContents = ({ session }) => {
           </button>
         </div>
 
-        {/* Overview Cards */}
+        {/* cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="bg-white p-4 rounded-lg shadow-sm">
             <p className="text-gray-500">Tasks Due Today</p>
@@ -177,7 +181,7 @@ const DashboardContents = ({ session }) => {
           </div>
         </div>
 
-        {/* Upcoming Tasks */}
+        {/* upcoming task */}
         <div className="space-y-4">
           <div className="flex justify-between items-center">
             <h4 className="text-xl font-semibold text-gray-800">
@@ -218,7 +222,7 @@ const DashboardContents = ({ session }) => {
           </ul>
         </div>
 
-        {/* Task Summary */}
+        {/* task Summary */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="bg-white p-4 rounded-lg shadow-sm">
             <p className="text-gray-600">Total Tasks: {filteredTasks.length}</p>
