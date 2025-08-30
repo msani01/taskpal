@@ -18,11 +18,9 @@ const Nav = () => {
 
   const navItems = [
     { url: "/", label: "Home" },
-    { url: "/aboutUs", label: "About Us" },
-    { url: "/features", label: "Features" },
-    { url: "/faqs", label: "FAQs" },
-    { url: "/testimonials", label: "Testimonials" },
-    { url: "/blogs", label: "Blogs" },
+    { url: "/dashboard", label: "Dashboard" },
+    { url: "/mytasks", label: "My Tasks" },
+    { url: "/calendar", label: "Calendar" }
   ];
   return (
       <main className="flex items-center justify-between mx-auto p-3 relative bg-white">
@@ -64,9 +62,6 @@ const Nav = () => {
           </button>
         ) : (
           <div className="flex items-center gap-2 text-sm">
-            <span className="text-gray-700">
-              Hi, {session.user.name?.split(" ")[0]}
-            </span>
             <button
               onClick={() => signOut()}
               className="px-3 hidden md:inline-block py-1 rounded bg-gray-100 text-gray-800
@@ -105,7 +100,7 @@ const Nav = () => {
 
       {/* mobile menu display */}
       {navOpen && (
-        <div className="absolute top-16 left-0 w-full bg-white shadow-md lg:hidden flex flex-col
+        <div className="absolute top-14 left-0 w-full bg-white shadow-md lg:hidden flex flex-col
          items-center gap-6 py-10 z-40">
           {navItems.map((item, i) => (
             <Link

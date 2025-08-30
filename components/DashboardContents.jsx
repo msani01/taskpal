@@ -4,13 +4,7 @@ import Link from "next/link";
 import { FiPlus } from "react-icons/fi";
 import { IoMdMenu } from "react-icons/io";
 import { db } from "@/lib/firebase.config";
-import {
-  collection,
-  onSnapshot,
-  query,
-  where,
-  orderBy,
-} from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 
 const DashboardContents = ({ session }) => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -18,29 +12,28 @@ const DashboardContents = ({ session }) => {
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    if (!session?.user?.uid) return;
+    const fetchTasks = async () => {
+      if (!session?.user?.id) return;
 
-    // Query tasks for the logged-in user only, ordered by due date.
-    const q = query(
-      collection(db, "tasks"),
-      where("userId", "==", session.user.uid),
-      orderBy("due", "asc")
-    );
+      try {
+        const q = query(
+          collection(db, "tasks"),
+          where("userId", "==", session.user.id)
+        );
+        const snapshot = await getDocs(q);
+        const data = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setTasks(data);
+      } catch (error) {
+        console.error("Error fetching tasks:", error);
+      }
+    };
 
-    // update listener for tasks immediately
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const data = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setTasks(data);
-    });
-
-    // Cleanup listener when deleted
-    return () => unsubscribe();
+    fetchTasks();
   }, [session]);
 
-  // dates handling
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -49,18 +42,14 @@ const DashboardContents = ({ session }) => {
     date1.getMonth() === date2.getMonth() &&
     date1.getDate() === date2.getDate();
 
-  // filter task by search inputed
   const filteredTasks = tasks.filter((task) =>
     task.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  //calculate task statistics
   const statusCounts = {
     todayCount: filteredTasks.filter(
       (t) =>
-        t.status === "Pending" &&
-        t.due &&
-        isSameDay(new Date(t.due), today)
+        t.status === "Pending" && isSameDay(new Date(t.due), today)
     ).length,
     overdue: filteredTasks.filter((t) => {
       if (t.status !== "Pending" || !t.due) return false;
@@ -71,30 +60,42 @@ const DashboardContents = ({ session }) => {
     completed: filteredTasks.filter((t) => t.status === "Completed").length,
     pending: filteredTasks.filter((t) => t.status === "Pending").length,
     nextDue: filteredTasks
-      .filter((t) => t.status === "Pending" && t.due && new Date(t.due) >= today)
+      .filter((t) => t.status === "Pending" && new Date(t.due) >= today)
       .sort((a, b) => new Date(a.due) - new Date(b.due))[0],
   };
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-gradient-to-r from-gray-50 to-blue-100 relative">
+    <div className="flex min-h-screen bg-gradient-to-br from-gray-50 to-blue-100">
       {/* sidebar */}
-      <div className="hidden md:block md:w-64 bg-white p-4 shadow-md absolute">
+      <div className="hidden md:flex flex-col w-64 fixed top-0 left-0 h-screen bg-gradient-to-b from-blue-700 to-blue-900 shadow-xl p-6">
         <Link href="/">
-          <h2 className="text-2xl font-bold mb-6 border-b border-gray-800 text-gray-800">
+          <h2 className="text-3xl font-extrabold text-white mb-8 tracking-wide">
             TaskPal
           </h2>
         </Link>
-        <nav className="flex flex-col space-y-4">
-          <Link href="/dashboard" className="text-blue-600 font-semibold">
+        <nav className="flex flex-col space-y-6 text-lg">
+          <Link
+            href="/dashboard"
+            className="text-white font-semibold hover:text-yellow-300 transition-colors"
+          >
             Dashboard
           </Link>
-          <Link href="/mytasks" className="text-gray-800 hover:text-blue-600">
+          <Link
+            href="/mytasks"
+            className="text-white hover:text-yellow-300 transition-colors"
+          >
             My Tasks
           </Link>
-          <Link href="/calendar" className="text-gray-800 hover:text-blue-600">
+          <Link
+            href="/calendar"
+            className="text-white hover:text-yellow-300 transition-colors"
+          >
             Calendar
           </Link>
-          <Link href="#" className="text-gray-800 hover:text-blue-600">
+          <Link
+            href="#"
+            className="text-white hover:text-yellow-300 transition-colors"
+          >
             Settings
           </Link>
         </nav>
@@ -102,37 +103,40 @@ const DashboardContents = ({ session }) => {
 
       {/* mobile sidebar */}
       <div
-        className={`fixed top-0 right-0 h-full w-64 bg-white shadow-lg p-4 transform transition-transform
-         z-40 md:hidden ${menuOpen ? "translate-x-0" : "translate-x-full"}`}
+        className={`fixed top-0 right-0 h-full w-64 bg-gradient-to-b from-blue-700 to-blue-900 shadow-lg p-6 transform transition-transform z-40 md:hidden ${
+          menuOpen ? "translate-x-0" : "translate-x-full"
+        }`}
       >
-        <Link href={"/"}>
-          <h2 className="text-2xl font-bold mb-6 text-gray-800">TaskPal</h2>
+        <Link href="/">
+          <h2 className="text-3xl font-extrabold text-white mb-8 tracking-wide">
+            TaskPal
+          </h2>
         </Link>
-        <nav className="flex flex-col space-y-4">
+        <nav className="flex flex-col space-y-6 text-lg">
           <Link
-            href={"/dashboard"}
-            className="text-blue-600 font-semibold"
+            href="/dashboard"
+            className="text-white font-semibold hover:text-yellow-300 transition-colors"
             onClick={() => setMenuOpen(false)}
           >
             Dashboard
           </Link>
           <Link
-            href={"/mytasks"}
-            className="text-gray-800 hover:text-blue-600"
+            href="/mytasks"
+            className="text-white hover:text-yellow-300 transition-colors"
             onClick={() => setMenuOpen(false)}
           >
             My Tasks
           </Link>
           <Link
-            href={"/calendar"}
-            className="text-gray-800 hover:text-blue-600"
+            href="/calendar"
+            className="text-white hover:text-yellow-300 transition-colors"
             onClick={() => setMenuOpen(false)}
           >
             Calendar
           </Link>
           <Link
-            href={"#"}
-            className="text-gray-800 hover:text-blue-600"
+            href="#"
+            className="text-white hover:text-yellow-300 transition-colors"
             onClick={() => setMenuOpen(false)}
           >
             Settings
@@ -141,41 +145,42 @@ const DashboardContents = ({ session }) => {
       </div>
 
       {/* content */}
-      <main className="w-full p-4 sm:p-6 flex flex-col space-y-6">
-        <div className="flex justify-between items-center gap-3 md:gap-6 mb-4">
+      <main className="flex-1 md:ml-64 p-6 sm:p-8 space-y-8">
+        {/* search and menu toggle */}
+        <div className="flex justify-between items-center gap-3 md:gap-6">
           <input
             type="text"
             placeholder="Search tasks..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="flex-grow px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm 
-              focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600"
+            className="flex-grow px-4 py-3 border border-gray-300 bg-white rounded-lg shadow-sm 
+              focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
           />
           <button
-            className="md:hidden p-2 bg-gray-800 rounded text-white shadow-md"
+            className="md:hidden p-3 bg-blue-700 rounded-lg text-white shadow-md hover:bg-blue-800 transition"
             onClick={() => setMenuOpen(!menuOpen)}
           >
-            <IoMdMenu size={24} />
+            <IoMdMenu size={28} />
           </button>
         </div>
 
         {/* cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="bg-white p-4 rounded-lg shadow-sm">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition">
             <p className="text-gray-500">Tasks Due Today</p>
-            <h3 className="text-2xl font-semibold text-amber-500">
+            <h3 className="text-4xl font-extrabold text-amber-500">
               {statusCounts.todayCount}
             </h3>
           </div>
-          <div className="bg-white p-4 rounded-lg shadow-sm">
+          <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition">
             <p className="text-gray-500">Overdue</p>
-            <h3 className="text-2xl font-semibold text-red-500">
+            <h3 className="text-4xl font-extrabold text-red-500">
               {statusCounts.overdue}
             </h3>
           </div>
-          <div className="bg-white p-4 rounded-lg shadow-sm">
+          <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition">
             <p className="text-gray-500">Completed</p>
-            <h3 className="text-2xl font-semibold text-green-500">
+            <h3 className="text-4xl font-extrabold text-green-500">
               {statusCounts.completed}
             </h3>
           </div>
@@ -184,30 +189,30 @@ const DashboardContents = ({ session }) => {
         {/* upcoming task */}
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <h4 className="text-xl font-semibold text-gray-800">
+            <h4 className="text-2xl font-bold text-gray-800">
               Upcoming Task(s)
             </h4>
             <Link href="/addtasks" className="hidden md:block">
-              <button className="flex items-center bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-md">
-                <span className="mr-2 text-lg font-bold">+</span> New Task
+              <button className="flex items-center bg-blue-600 hover:bg-blue-700 text-white text-base px-5 py-3 rounded-lg shadow-md">
+                <span className="mr-2 text-xl font-bold">+</span> New Task
               </button>
             </Link>
             <Link href="/addtasks" className="block md:hidden">
-              <button className="p-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-md">
-                <FiPlus size={20} />
+              <button className="p-3 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-md">
+                <FiPlus size={22} />
               </button>
             </Link>
           </div>
 
-          <ul className="space-y-2">
+          <ul className="space-y-3">
             {filteredTasks.map((task) => (
               <li
                 key={task.id}
-                className="p-3 bg-white rounded-lg shadow-sm flex justify-between items-center"
+                className="p-4 bg-white rounded-lg shadow-md hover:shadow-lg transition flex justify-between items-center"
               >
-                <span className="text-gray-700 font-medium">{task.title}</span>
+                <span className="text-gray-800 font-semibold">{task.title}</span>
                 <span
-                  className={`text-sm font-medium px-2 py-1 rounded ${
+                  className={`text-sm font-medium px-3 py-1 rounded-full ${
                     task.status === "Completed"
                       ? "bg-green-100 text-green-700"
                       : new Date(task.due) < today
@@ -222,17 +227,17 @@ const DashboardContents = ({ session }) => {
           </ul>
         </div>
 
-        {/* task Summary */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="bg-white p-4 rounded-lg shadow-sm">
+        {/* task summary */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="bg-white p-6 rounded-xl shadow-lg">
             <p className="text-gray-600">Total Tasks: {filteredTasks.length}</p>
             <p className="text-gray-600">Pending: {statusCounts.pending}</p>
             <p className="text-gray-600">Completed: {statusCounts.completed}</p>
             <p className="text-gray-600">Overdue: {statusCounts.overdue}</p>
           </div>
-          <div className="bg-white p-4 rounded-lg shadow-sm">
+          <div className="bg-white p-6 rounded-xl shadow-lg">
             <p className="text-gray-600">Next Due Task:</p>
-            <p className="font-medium text-blue-700 mt-2">
+            <p className="font-bold text-blue-700 mt-2 text-lg">
               {statusCounts.nextDue?.title || "None"}
             </p>
           </div>
