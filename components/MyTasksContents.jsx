@@ -93,13 +93,13 @@ const MyTasksContents = () => {
         <nav className="flex flex-col space-y-6 text-lg">
           <Link
             href="/dashboard"
-            className="text-white font-semibold hover:text-yellow-300 transition-colors"
+            className="text-white hover:text-yellow-300 transition-colors"
           >
             Dashboard
           </Link>
           <Link
             href="/mytasks"
-            className="text-white hover:text-yellow-300 transition-colors"
+            className="text-white  font-semibold hover:text-yellow-300 transition-colors"
           >
             My Tasks
           </Link>
@@ -167,12 +167,14 @@ const MyTasksContents = () => {
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-gray-800">My Tasks</h1>
           <Link href="/add-task">
-            <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md">
+            <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white
+             px-4 py-2 rounded-lg shadow-md">
               <FiPlus /> Add Task
             </button>
           </Link>
           <button
-            className="md:hidden p-3 bg-blue-700 rounded-lg text-white shadow-md hover:bg-blue-800 transition"
+            className="md:hidden p-3 bg-blue-700 rounded-lg text-white shadow-md hover:bg-blue-800
+             transition"
             onClick={() => setSidebarOpen(!sidebarOpen)}
           >
             <IoMdMenu size={28} />
@@ -184,7 +186,7 @@ const MyTasksContents = () => {
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            className="border p-2 rounded shadow-sm"
+            className="border p-2 rounded shadow-sm bg-blue-600"
           >
             <option value="All">All</option>
             <option value="Pending">Pending</option>
@@ -195,13 +197,14 @@ const MyTasksContents = () => {
 
         {/* Task List */}
         {filteredTasks.length === 0 ? (
-          <p className="text-gray-600 mt-6">No tasks to show.</p>
+          <p className="text-gray-800 mt-6">No tasks to show.</p>
         ) : (
           <ul className="space-y-4 mt-6">
             {filteredTasks.map((task) => (
               <li
                 key={task.id}
-                className="p-5 bg-white rounded-lg shadow-md hover:shadow-lg transition flex flex-col md:flex-row justify-between items-start md:items-center"
+                className="p-5 bg-white rounded-lg shadow-md hover:shadow-lg transition flex flex-col
+                 md:flex-row justify-between items-start md:items-center"
               >
                 <div className="flex-1">
                   <h3 className="font-semibold text-lg text-gray-800">
@@ -230,13 +233,15 @@ const MyTasksContents = () => {
                 <div className="flex gap-2 mt-3 md:mt-0 md:ml-4">
                   <button
                     onClick={() => handleStatusToggle(task)}
-                    className="px-3 py-1 bg-green-500 hover:bg-green-600 text-white rounded text-sm shadow-sm"
+                    className="px-3 py-1 bg-green-500 hover:bg-green-600 text-white rounded text-sm
+                     shadow-sm"
                   >
                     {task.status === "Completed" ? "Mark Pending" : "Mark Done"}
                   </button>
                   <button
                     onClick={() => handleDelete(task.id)}
-                    className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded text-sm flex items-center shadow-sm"
+                    className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded text-sm flex
+                     items-center shadow-sm"
                   >
                     <MdDelete />
                   </button>
