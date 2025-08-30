@@ -37,30 +37,35 @@ const AddTaskComponent = ({ session }) => {
       .min(startOfToday(), "Unable to add a task to the past."),
   });
 
-  const handleSubmit = async (values, { resetForm }) => {
-    if (!uid || !author) {
-      alert("You must be logged in to add a task.");
-      return;
-    }
+const handleSubmit = async (values, { resetForm }) => {
+  const user = auth.currentUser;
 
-    setLoading(true);
-    try {
-      const taskData = {
-        ...values,
-        createdAt: new Date().toISOString(),
-        author,
-        userId: uid, 
-      };
-      await addDoc(collection(db, "tasks"), taskData);
-      setShowModal(true);
-      resetForm();
-    } catch (error) {
-      console.error("Failed to add task:", error);
-      alert("Failed to add task");
-    } finally {
-      setLoading(false);
-    }
-  };
+   console.log("Current user:", user);
+
+  if (!user) {
+    alert("You must be logged in to add a task.");
+    return;
+  }
+
+  setLoading(true);
+  try {
+    const taskData = {
+      ...values,
+      createdAt: serverTimestamp(),
+      author: user.displayName || session?.user?.name || "Anonymous",
+      userId: user.uid,
+    };
+
+    await addDoc(collection(db, "tasks"), taskData);
+    setShowModal(true);
+    resetForm();
+  } catch (error) {
+    console.error("Failed to add task:", error.code, error.message);
+    alert(`Failed to add task: ${error.message}`);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const today = new Date().toISOString().split("T")[0];
 

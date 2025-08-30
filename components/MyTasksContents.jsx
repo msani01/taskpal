@@ -165,7 +165,7 @@ const MyTasksContents = () => {
 
       {/* main content */}
       <main className="flex-1 md:ml-64 p-4 sm:p-8 space-y-6">
-        {/* header + add task button */}
+        {/* header*/}
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-gray-800">My Tasks</h1>
           
@@ -179,7 +179,7 @@ const MyTasksContents = () => {
         </div>
 
         {/* filter dropdown And Add tasks button */}
-        <div className="flex justify-between">
+        <div className="flex justify-between items-center">
           <div>
             <select
               value={filter}
