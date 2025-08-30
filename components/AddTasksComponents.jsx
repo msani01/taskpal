@@ -6,11 +6,12 @@ import { SlPaperPlane } from "react-icons/sl";
 import { TbLoader3 } from "react-icons/tb";
 import { IoIosClose } from "react-icons/io";
 import { FaCheckCircle } from "react-icons/fa";
-import { collection, addDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase.config";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { db, auth } from "@/lib/firebase.config";
 import Nav from "./Nav";
 import Footer from "./Footer";
 import { startOfToday } from "date-fns";
+
 
 const AddTaskComponent = ({ session }) => {
   const [loading, setLoading] = useState(false);
