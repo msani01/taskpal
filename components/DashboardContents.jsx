@@ -104,7 +104,7 @@ const DashboardContents = ({ session }) => {
       {/* mobile sidebar */}
       <div
         className={`fixed top-0 left-0 h-full w-64 bg-gradient-to-b from-blue-700 to-blue-900 
-          shadow-lg p-6 transform transition-transform z-40 md:hidden ${
+          shadow-lg p-6 transform transition-transform z-50 md:hidden ${
           menuOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
