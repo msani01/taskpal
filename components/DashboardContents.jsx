@@ -20,7 +20,7 @@ const DashboardContents = ({ session }) => {
   useEffect(() => {
     if (!session?.user?.uid) return;
 
-    // Query tasks for the logged-in user only, ordered by due date
+    // Query tasks for the logged-in user only, ordered by due date.
     const q = query(
       collection(db, "tasks"),
       where("userId", "==", session.user.uid),
