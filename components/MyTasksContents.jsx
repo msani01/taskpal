@@ -192,9 +192,9 @@ const MyTasksContents = () => {
               <option value="Overdue">Overdue</option>
             </select>
           </div>
-          <Link href="/add-task">
+          <Link href="/add-task" className="hidden md:block">
               <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-900 text-white
-              px-4 py-2 rounded-lg shadow-md">
+              px-4 py-2 rounded-lg shadow-md ">
                 <span className="mr-2 text-xl font-bold">+</span> Add Task
               </button>
           </Link>
