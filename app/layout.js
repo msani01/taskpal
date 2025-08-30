@@ -14,7 +14,12 @@ const geistMono = Geist_Mono({
 
 export const metadata = {
   title: "TaskPal",
-  description: "",
+  description: "Stay organized, manage tasks, and boost productivity with TaskPal.",
+  icons: {
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({ children }) {
@@ -23,10 +28,10 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        {/* NextAuth Session Provider */}
         <SessionProvider>
           {children}
         </SessionProvider>
-
       </body>
     </html>
   );
