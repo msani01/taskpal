@@ -123,7 +123,7 @@ const MyTasksContents = () => {
       <div
         className={`fixed top-0 left-0 h-full w-64 bg-gradient-to-b from-blue-700 to-blue-900
            shadow-lg p-6 transform transition-transform z-40 md:hidden ${
-          sidebarOpen ? "translate-x-0" : "translate-x-full"
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         <Link href="/">
