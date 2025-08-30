@@ -194,7 +194,7 @@ const MyTasksContents = () => {
           </div>
           <Link href="/add-task">
               <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-900 text-white
-              px-4 py-2 rounded-lg shadow-md md:hidden">
+              px-4 py-2 rounded-lg shadow-md">
                 <FiPlus /> Add Task
               </button>
             </Link>
