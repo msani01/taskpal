@@ -24,9 +24,8 @@ const Nav = () => {
     { url: "/testimonials", label: "Testimonials" },
     { url: "/blogs", label: "Blogs" },
   ];
-
   return (
-    <main className="flex items-center justify-between mx-auto p-3 relative bg-white">
+      <main className="flex items-center justify-between mx-auto p-3 relative bg-white">
       {/* logo */}
       <Link href="/" className="flex items-center gap-2">
         <Image
@@ -121,7 +120,13 @@ const Nav = () => {
         </div>
       )}
     </main>
-  );
-};
+  )
+}
 
-export default Nav;
+export default Nav
+
+
+
+
+
+ 

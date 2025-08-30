@@ -1,3 +1,4 @@
+"use client"
 import CalendarPage from '@/components/CalendarPage'
 import React from 'react'
 

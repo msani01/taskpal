@@ -7,20 +7,19 @@ const signin = () => {
         Sign in to your account to continue</h1>
       <div className="flex items-center justify-center">
         <div className="space-y-10 max-md:w-full md:w-xl">
-         
           <form
-      action={async () => {
-        "use server"
-        await signIn("google")
-      }}
-    >
+            action={async () => {
+              "use server"
+              await signIn("google")
+            }}
+          >
        <button className="border flex items-center justify-center gap-2 bg-blue-600 text-white
         py-4 rounded-full text-xl hover:bg-blue-700 transition-all w-full">
             <p>Sign In with Google</p>
             <FaGoogle />
           </button>
       
-    </form>
+          </form>
           <button className="border flex items-center justify-center gap-2 bg-blue-600 text-white 
           py-4 rounded-full text-xl hover:bg-blue-700 transition-all w-full">
             <p>Sign In with Github</p>
