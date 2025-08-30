@@ -194,13 +194,13 @@ const DashboardContents = ({ session }) => {
             <h4 className="text-2xl font-bold text-gray-800">
               Upcoming Task(s)
             </h4>
-            <Link href="/add-tasks" className="hidden md:block">
+            <Link href="/add-task" className="hidden md:block">
               <button className="flex items-center bg-blue-600 hover:bg-blue-700 text-white text-base
                px-5 py-3 rounded-lg shadow-md">
                 <span className="mr-2 text-xl font-bold">+</span> New Task
               </button>
             </Link>
-            <Link href="/add-tasks" className="block md:hidden">
+            <Link href="/add-task" className="block md:hidden">
               <button className="p-3 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-md">
                 <FiPlus size={22} />
               </button>
