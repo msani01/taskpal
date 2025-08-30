@@ -19,7 +19,7 @@ const Footer = () => {
     max-lg:gap-3 items-center justify-between">
       <Link href={"/"} className="flex items-center gap-1 z-50">
         <Image
-          src={"/bgimage.png"}
+          src={"/logo.png"}
           alt="logo"
           width={800}
           height={800}
