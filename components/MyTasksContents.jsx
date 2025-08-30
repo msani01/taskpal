@@ -122,7 +122,7 @@ const MyTasksContents = () => {
       {/* mobile sidebar */}
       <div
         className={`fixed top-0 left-0 h-full w-64 bg-gradient-to-b from-blue-700 to-blue-900
-           shadow-lg p-6 transform transition-transform z-40 md:hidden ${
+           shadow-lg p-6 transform transition-transform z-50 md:hidden ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -184,7 +184,7 @@ const MyTasksContents = () => {
             <select
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
-              className="border p-2 rounded shadow-sm bg-blue-600"
+              className="border border-blue-700 p-2 rounded shadow-sm bg-blue-600"
             >
               <option value="All">All</option>
               <option value="Pending">Pending</option>
@@ -193,7 +193,7 @@ const MyTasksContents = () => {
             </select>
           </div>
           <Link href="/add-task">
-              <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white
+              <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-900 text-white
               px-4 py-2 rounded-lg shadow-md md:hidden">
                 <FiPlus /> Add Task
               </button>
