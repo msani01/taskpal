@@ -100,7 +100,7 @@ const Nav = () => {
 
       {/* mobile menu display */}
       {navOpen && (
-        <div className="absolute top-14 left-0 w-full bg-white shadow-md lg:hidden flex flex-col
+        <div className="absolute top-14 left-0 w-full bg-gray-200 shadow-md lg:hidden flex flex-col
          items-center gap-6 py-10 z-40">
           {navItems.map((item, i) => (
             <Link

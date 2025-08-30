@@ -83,8 +83,9 @@ const MyTasksContents = () => {
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-gray-50 to-blue-100">
-      {/* Fixed Sidebar */}
-      <div className="hidden md:flex flex-col w-64 fixed top-0 left-0 h-screen bg-gradient-to-b from-blue-700 to-blue-900 shadow-xl p-6">
+      {/* fixed sidebar */}
+      <div className="hidden md:flex flex-col w-64 fixed top-0 left-0 h-screen bg-gradient-to-b
+       from-blue-700 to-blue-900 shadow-xl p-6">
         <Link href="/">
           <h2 className="text-3xl font-extrabold text-white mb-8 tracking-wide">
             TaskPal
@@ -118,9 +119,10 @@ const MyTasksContents = () => {
         </nav>
       </div>
 
-      {/* Mobile Sidebar */}
+      {/* mobile sidebar */}
       <div
-        className={`fixed top-0 right-0 h-full w-64 bg-gradient-to-b from-blue-700 to-blue-900 shadow-lg p-6 transform transition-transform z-40 md:hidden ${
+        className={`fixed top-0 left-0 h-full w-64 bg-gradient-to-b from-blue-700 to-blue-900
+           shadow-lg p-6 transform transition-transform z-40 md:hidden ${
           sidebarOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -161,17 +163,12 @@ const MyTasksContents = () => {
         </nav>
       </div>
 
-      {/* Main Content */}
-      <main className="flex-1 md:ml-64 p-6 sm:p-8 space-y-6">
-        {/* Header + Add Task Button */}
+      {/* main content */}
+      <main className="flex-1 md:ml-64 p-4 sm:p-8 space-y-6">
+        {/* header + add task button */}
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-gray-800">My Tasks</h1>
-          <Link href="/add-task">
-            <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white
-             px-4 py-2 rounded-lg shadow-md">
-              <FiPlus /> Add Task
-            </button>
-          </Link>
+          <h1 className="text-2xl font-bold text-gray-800">My Tasks</h1>
+          
           <button
             className="md:hidden p-3 bg-blue-700 rounded-lg text-white shadow-md hover:bg-blue-800
              transition"
@@ -181,21 +178,29 @@ const MyTasksContents = () => {
           </button>
         </div>
 
-        {/* Filter Dropdown */}
-        <div>
-          <select
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            className="border p-2 rounded shadow-sm bg-blue-600"
-          >
-            <option value="All">All</option>
-            <option value="Pending">Pending</option>
-            <option value="Completed">Completed</option>
-            <option value="Overdue">Overdue</option>
-          </select>
-        </div>
+        {/* filter dropdown And Add tasks button */}
+        <div className="flex justify-between">
+          <div>
+            <select
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              className="border p-2 rounded shadow-sm bg-blue-600"
+            >
+              <option value="All">All</option>
+              <option value="Pending">Pending</option>
+              <option value="Completed">Completed</option>
+              <option value="Overdue">Overdue</option>
+            </select>
+          </div>
+          <Link href="/add-task">
+              <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white
+              px-4 py-2 rounded-lg shadow-md md:hidden">
+                <FiPlus /> Add Task
+              </button>
+            </Link>
+          </div>
 
-        {/* Task List */}
+        {/* task list */}
         {filteredTasks.length === 0 ? (
           <p className="text-gray-800 mt-6">No tasks to show.</p>
         ) : (

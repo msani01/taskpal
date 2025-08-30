@@ -67,7 +67,8 @@ const DashboardContents = ({ session }) => {
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-gray-50 to-blue-100">
       {/* sidebar */}
-      <div className="hidden md:flex flex-col w-64 fixed top-0 left-0 h-screen bg-gradient-to-b from-blue-700 to-blue-900 shadow-xl p-6">
+      <div className="hidden md:flex flex-col w-64 fixed top-0 left-0 h-screen bg-gradient-to-b
+       from-blue-700 to-blue-900 shadow-xl p-6">
         <Link href="/">
           <h2 className="text-3xl font-extrabold text-white mb-8 tracking-wide">
             TaskPal
@@ -103,7 +104,8 @@ const DashboardContents = ({ session }) => {
 
       {/* mobile sidebar */}
       <div
-        className={`fixed top-0 right-0 h-full w-64 bg-gradient-to-b from-blue-700 to-blue-900 shadow-lg p-6 transform transition-transform z-40 md:hidden ${
+        className={`fixed top-0 left-0 h-full w-64 bg-gradient-to-b from-blue-700 to-blue-900 
+          shadow-lg p-6 transform transition-transform z-40 md:hidden ${
           menuOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -157,7 +159,8 @@ const DashboardContents = ({ session }) => {
               focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
           />
           <button
-            className="md:hidden p-3 bg-blue-700 rounded-lg text-white shadow-md hover:bg-blue-800 transition"
+            className="md:hidden p-3 bg-blue-700 rounded-lg text-white shadow-md hover:bg-blue-800
+             transition"
             onClick={() => setMenuOpen(!menuOpen)}
           >
             <IoMdMenu size={28} />
@@ -193,11 +196,12 @@ const DashboardContents = ({ session }) => {
               Upcoming Task(s)
             </h4>
             <Link href="/addtasks" className="hidden md:block">
-              <button className="flex items-center bg-blue-600 hover:bg-blue-700 text-white text-base px-5 py-3 rounded-lg shadow-md">
+              <button className="flex items-center bg-blue-600 hover:bg-blue-700 text-white text-base
+               px-5 py-3 rounded-lg shadow-md">
                 <span className="mr-2 text-xl font-bold">+</span> New Task
               </button>
             </Link>
-            <Link href="/addtasks" className="block md:hidden">
+            <Link href="/add-task" className="block md:hidden">
               <button className="p-3 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-md">
                 <FiPlus size={22} />
               </button>
@@ -208,7 +212,8 @@ const DashboardContents = ({ session }) => {
             {filteredTasks.map((task) => (
               <li
                 key={task.id}
-                className="p-4 bg-white rounded-lg shadow-md hover:shadow-lg transition flex justify-between items-center"
+                className="p-4 bg-white rounded-lg shadow-md hover:shadow-lg transition flex justify-between
+                 items-center"
               >
                 <span className="text-gray-800 font-semibold">{task.title}</span>
                 <span
