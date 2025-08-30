@@ -67,8 +67,7 @@ const DashboardContents = ({ session }) => {
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-gray-50 to-blue-100">
       {/* sidebar */}
-      <div className="hidden md:flex flex-col w-64 fixed top-0 left-0 h-screen bg-gradient-to-b
-       from-blue-700 to-blue-900 shadow-xl p-6">
+      <div className="hidden md:flex flex-col w-64 fixed top-0 left-0 h-screen bg-gradient-to-b from-blue-700 to-blue-900 shadow-xl p-6">
         <Link href="/">
           <h2 className="text-3xl font-extrabold text-white mb-8 tracking-wide">
             TaskPal
@@ -195,13 +194,13 @@ const DashboardContents = ({ session }) => {
             <h4 className="text-2xl font-bold text-gray-800">
               Upcoming Task(s)
             </h4>
-            <Link href="/addtasks" className="hidden md:block">
+            <Link href="/add-tasks" className="hidden md:block">
               <button className="flex items-center bg-blue-600 hover:bg-blue-700 text-white text-base
                px-5 py-3 rounded-lg shadow-md">
                 <span className="mr-2 text-xl font-bold">+</span> New Task
               </button>
             </Link>
-            <Link href="/add-task" className="block md:hidden">
+            <Link href="/add-tasks" className="block md:hidden">
               <button className="p-3 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-md">
                 <FiPlus size={22} />
               </button>
