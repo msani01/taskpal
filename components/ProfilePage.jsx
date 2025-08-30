@@ -39,7 +39,7 @@ const ProfilePage = () => {
       <div className="space-y-2 text-gray-700">
         <div className="flex justify-between">
           <span>Total Tasks:</span>
-          <span className="font-medium">32</span> {/* I need to replace with the real count */}
+          <span className="font-medium">32</span> {/*need to replace with the real count */}
         </div>
         <div className="flex justify-between">
           <span>Tasks Completed:</span>
@@ -47,7 +47,7 @@ const ProfilePage = () => {
         </div>
         <div className="flex justify-between">
           <span>Joined:</span>
-          <span className="font-medium">July 2025</span> {/* Use actual date if stored */}
+          <span className="font-medium">July 2025</span> {/* use actual date if stored */}
         </div>
       </div>
 
