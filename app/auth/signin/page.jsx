@@ -40,7 +40,7 @@ const page = async () => {
               </button>
             </form>
 
-
+            {/* Sign in with Facebook */}
             <button
               className="w-full py-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
               disabled
