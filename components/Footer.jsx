@@ -15,11 +15,7 @@ const Footer = () => {
     { url: "#", label: "Terms of Use" },
   ];
   return (
-<<<<<<< HEAD
-    <main className="px-10 py-4 bg-teal-50 border-top border-gray-300 flex max-lg:flex-col 
-=======
     <main className="px-10 py-4 bg-gray-500 border-top border-gray-300 flex max-lg:flex-col 
->>>>>>> parent of ee17db1 (progress)
     max-lg:gap-3 items-center justify-between">
       <Link href={"/"} className="flex items-center gap-1 z-50">
         <Image

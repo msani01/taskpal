@@ -11,7 +11,7 @@ const page = async () => {
     redirect("/auth/signin");
   }
 
-  return <MyTasksContents/>;
+  return (<MyTasksContents/>);
 };
 
 export default page;
