@@ -1,10 +1,13 @@
 import AddTaskComponent from '@/components/AddTasksComponents'
+import ProtectedRoute from '@/components/ProtectedRoute'
 import React from 'react'
 
 const page = () => {
   return (
     <section>
-        <AddTaskComponent/>
+        <ProtectedRoute>
+          <AddTaskComponent/>
+        </ProtectedRoute>
     </section>
   )
 }
