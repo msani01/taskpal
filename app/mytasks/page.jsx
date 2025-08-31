@@ -2,7 +2,6 @@
 import MyTasksContents from "@/components/MyTasksContents";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
-import ProtectedRoute from "@/components/ProtectedRoute";
 
 
 const page = async () => {
@@ -14,10 +13,7 @@ const page = async () => {
 
   return (
     <div>
-      <ProtectedRoute>
-        <MyTasksContents/>;
-      </ProtectedRoute>
-      
+      <MyTasksContents/>;
     </div>
   )  
 };

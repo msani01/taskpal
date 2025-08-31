@@ -15,6 +15,7 @@ import {
   orderBy,
 } from "firebase/firestore";
 import { db, auth } from "@/lib/firebase.config";
+import ProtectedRoute from "./ProtectedRoute";
 
 const MyTasksContents = () => {
   const [myTasks, setMyTasks] = useState([]);
@@ -95,6 +96,7 @@ const MyTasksContents = () => {
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-gray-50 to-blue-100">
+      <ProtectedRoute>
       {/* fixed sidebar */}
       <div className="hidden md:flex flex-col w-64 fixed top-0 left-0 h-screen bg-gradient-to-b
        from-blue-700 to-blue-900 shadow-xl p-6">
@@ -226,6 +228,7 @@ const MyTasksContents = () => {
           </ul>
         )}
       </main>
+      </ProtectedRoute>
     </div>
   );
 };

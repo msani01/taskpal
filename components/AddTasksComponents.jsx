@@ -11,6 +11,7 @@ import { db, auth } from "@/lib/firebase.config";
 import Nav from "./Nav";
 import Footer from "./Footer";
 import { startOfToday } from "date-fns";
+import ProtectedRoute from "./ProtectedRoute";
 
 const AddTaskComponent = () => {
   const [loading, setLoading] = useState(false);
@@ -19,7 +20,7 @@ const AddTaskComponent = () => {
   const initialValues = {
     title: "",
     description: "",
-    due: "",        // HTML <input type="date" /> string (YYYY-MM-DD)
+    due: "",       
     status: "Pending",
   };
 
@@ -43,7 +44,7 @@ const AddTaskComponent = () => {
 
     setLoading(true);
     try {
-      // Convert the YYYY-MM-DD to a Firestore Timestamp (midnight local)
+      
       const dueDate = new Date(values.due);
       dueDate.setHours(0, 0, 0, 0);
 
@@ -51,10 +52,10 @@ const AddTaskComponent = () => {
         title: values.title.trim(),
         description: values.description.trim(),
         status: values.status,
-        due: Timestamp.fromDate(dueDate),      // ✅ store as Timestamp
+        due: Timestamp.fromDate(dueDate),     
         createdAt: serverTimestamp(),
         author: user.displayName || user.email || "Anonymous",
-        userId: user.uid,                      // ✅ consistent everywhere
+        userId: user.uid,                      
       };
 
       const docRef = await addDoc(collection(db, "tasks"), taskData);
@@ -74,8 +75,9 @@ const AddTaskComponent = () => {
 
   return (
     <div>
-      <Nav />
-      <main className="min-h-screen bg-gray-100 p-4 relative">
+      <ProtectedRoute>
+        <Nav />
+        <main className="min-h-screen bg-gray-100 p-4 relative">
         <section className="max-w-xl mx-auto bg-white p-6 rounded shadow-md">
           <h2 className="text-xl font-semibold mb-4 text-center text-gray-800">Add a New Task</h2>
 
@@ -139,7 +141,8 @@ const AddTaskComponent = () => {
           </div>
         )}
       </main>
-      <Footer />
+       <Footer />
+      </ProtectedRoute>
     </div>
   );
 };
