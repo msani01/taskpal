@@ -13,6 +13,7 @@ import Footer from "./Footer";
 import { startOfToday } from "date-fns";
 import ProtectedRoute from "./ProtectedRoute";
 
+
 const AddTaskComponent = () => {
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
