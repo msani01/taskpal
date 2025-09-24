@@ -1,6 +1,6 @@
 "use client";
-import React, { useState } from "react";
-import { ErrorMessage, Field, Form, Formik } from "formik";
+import React, { useState, useEffect } from "react";
+import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { SlPaperPlane } from "react-icons/sl";
 import { TbLoader3 } from "react-icons/tb";
@@ -13,17 +13,19 @@ import Footer from "./Footer";
 import { startOfToday } from "date-fns";
 import ProtectedRoute from "./ProtectedRoute";
 
-
 const AddTaskComponent = () => {
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [user, setUser] = useState(null);
 
-  const initialValues = {
-    title: "",
-    description: "",
-    due: "",       
-    status: "Pending",
-  };
+  useEffect(() => {
+    const unsub = auth.onAuthStateChanged((currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsub();
+  }, []);
+
+  const initialValues = { title: "", description: "", due: "", status: "Pending" };
 
   const validationSchema = Yup.object({
     title: Yup.string().required("Task title is required"),
@@ -31,21 +33,14 @@ const AddTaskComponent = () => {
     due: Yup.date()
       .transform((value, originalValue) => (originalValue ? new Date(originalValue) : null))
       .required("Due date is required")
-      .min(startOfToday(), "Unable to add a task to the past."),
+      .min(startOfToday(), "Cannot add a task in the past."),
   });
 
   const handleSubmit = async (values, { resetForm }) => {
-    const user = auth.currentUser;
-    console.log("[AddTask] currentUser:", user);
-
-    if (!user) {
-      alert("You must be logged in to add a task.");
-      return;
-    }
+    if (!user) return alert("You must be logged in.");
 
     setLoading(true);
     try {
-      
       const dueDate = new Date(values.due);
       dueDate.setHours(0, 0, 0, 0);
 
@@ -53,20 +48,18 @@ const AddTaskComponent = () => {
         title: values.title.trim(),
         description: values.description.trim(),
         status: values.status,
-        due: Timestamp.fromDate(dueDate),     
+        due: Timestamp.fromDate(dueDate),
         createdAt: serverTimestamp(),
         author: user.displayName || user.email || "Anonymous",
-        userId: user.uid,                      
+        userId: user.uid,
       };
 
-      const docRef = await addDoc(collection(db, "tasks"), taskData);
-      console.log("[AddTask] saved doc id:", docRef.id, "data:", taskData);
-
+      await addDoc(collection(db, "tasks"), taskData);
       setShowModal(true);
       resetForm();
-    } catch (error) {
-      console.error("[AddTask] Failed to add task:", error);
-      alert(`Failed to add task: ${error.message}`);
+    } catch (err) {
+      console.error(err);
+      alert(`Failed to add task: ${err.message}`);
     } finally {
       setLoading(false);
     }
@@ -75,56 +68,37 @@ const AddTaskComponent = () => {
   const today = new Date().toISOString().split("T")[0];
 
   return (
-    <div>
-      <ProtectedRoute>
-        <Nav />
-        <main className="min-h-screen bg-gray-100 p-4 relative">
+    <ProtectedRoute>
+      <Nav />
+      <main className="min-h-screen bg-gray-100 p-4">
         <section className="max-w-xl mx-auto bg-white p-6 rounded shadow-md">
-          <h2 className="text-xl font-semibold mb-4 text-center text-gray-800">Add a New Task</h2>
-
+          <h2 className="text-xl font-semibold mb-4 text-center">Add a New Task</h2>
           <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
             <Form className="space-y-4">
               <div>
                 <label className="text-sm text-gray-800">Title</label>
-                <Field
-                  name="title"
-                  className="w-full p-2 border border-gray-300 text-gray-700 rounded"
-                  placeholder="Enter task title"
-                />
+                <Field name="title" className="w-full p-2 border rounded" placeholder="Enter task title" />
                 <ErrorMessage name="title" component="p" className="text-xs text-red-500" />
               </div>
 
               <div>
                 <label className="text-sm text-gray-800">Description</label>
-                <Field
-                  name="description"
-                  as="textarea"
-                  className="w-full p-2 border border-gray-300 text-gray-700 rounded"
-                  placeholder="Task description..."
-                />
+                <Field name="description" as="textarea" className="w-full p-2 border rounded" placeholder="Task description" />
                 <ErrorMessage name="description" component="p" className="text-xs text-red-500" />
               </div>
 
               <div>
                 <label className="text-sm text-gray-800">Due Date</label>
-                <Field
-                  type="date"
-                  name="due"
-                  min={today}
-                  className="w-full p-2 border border-gray-300 text-gray-700 rounded"
-                />
+                <Field type="date" name="due" min={today} className="w-full p-2 border rounded" />
                 <ErrorMessage name="due" component="p" className="text-xs text-red-500" />
               </div>
 
               <button
                 type="submit"
                 disabled={loading}
-                className={`flex items-center justify-center w-full p-2 text-white rounded transition ${
-                  loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
-                }`}
+                className={`flex items-center justify-center w-full p-2 text-white rounded ${loading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"}`}
               >
-                {loading ? <TbLoader3 className="text-xl animate-spin" /> : <span className="flex 
-                items-center gap-2">Add Task <SlPaperPlane /></span>}
+                {loading ? <TbLoader3 className="animate-spin text-xl" /> : <span className="flex items-center gap-2">Add Task <SlPaperPlane /></span>}
               </button>
             </Form>
           </Formik>
@@ -142,9 +116,8 @@ const AddTaskComponent = () => {
           </div>
         )}
       </main>
-       <Footer />
-      </ProtectedRoute>
-    </div>
+      <Footer />
+    </ProtectedRoute>
   );
 };
 
