@@ -9,30 +9,17 @@
     "lint": "next lint"
   },
   "dependencies": {
-<<<<<<< HEAD
-<<<<<<< HEAD
     "@auth/firebase-adapter": "^2.10.0",
     "date-fns": "^4.1.0",
     "firebase": "^12.0.0",
     "firebase-admin": "^12.7.0",
     "formik": "^2.4.6",
     "icons": "^1.0.0",
-=======
->>>>>>> parent of ee17db1 (progress)
     "next": "15.3.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-<<<<<<< HEAD
     "react-icons": "^5.5.0",
     "yup": "^1.6.1"
-=======
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "next": "15.3.5"
->>>>>>> parent of 65da530 (taskpal)
-=======
-    "react-icons": "^5.5.0"
->>>>>>> parent of ee17db1 (progress)
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
