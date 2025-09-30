@@ -1,6 +1,6 @@
 
-import DashboardContents from "@/components/DashboardContents";
-import { auth } from "@/auth";
+import DashboardContents from "../../components/DashboardContents";
+import { auth } from "../auth";
 import { redirect } from "next/navigation";
 
 
