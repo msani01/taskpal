@@ -201,12 +201,17 @@ const DashboardContents = ({ session }) => {
                 key={task.id}
                 className="p-3 bg-white rounded-lg shadow-sm flex justify-between items-center"
               >
-                <span className="text-gray-700 font-medium">{task.title}</span>
+                <div>
+                  <p className="text-gray-700 font-medium">{task.title}</p>
+                  <p className="text-sm text-gray-500">
+                    {task.due ? task.due.toLocaleDateString() : "No deadline"}
+                  </p>
+                </div>
                 <span
                   className={`text-sm font-medium px-2 py-1 rounded ${
                     task.status === "Completed"
                       ? "bg-green-100 text-green-700"
-                      : new Date(task.due) < today
+                      : task.due && task.due < today
                       ? "bg-red-100 text-red-700"
                       : "bg-yellow-100 text-yellow-700"
                   }`}
@@ -217,6 +222,7 @@ const DashboardContents = ({ session }) => {
             ))}
           </ul>
         </div>
+
 
         {/* Task Summary */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
