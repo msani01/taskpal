@@ -1,6 +1,6 @@
 
 import MyTasksContents from "../../components/MyTasksContents";
-import { auth } from "../auth";
+import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 
 
