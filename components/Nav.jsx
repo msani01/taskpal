@@ -1,11 +1,10 @@
 "use client";
-import page from "@/app/page";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
 import { IoMdMenu } from "react-icons/io";
 import { IoMdClose } from "react-icons/io";
-import { FaPhoneAlt } from "react-icons/fa";
+import { useSession } from "next-auth/react";
 
 
 const Nav = () => {
@@ -16,8 +15,6 @@ const Nav = () => {
   const handleOpen = () => {
     setNavOpen(!navOpen);
   };
-
-  console.log(navOpen);
 
   const navItems = [
     { url: "/", label: "Home" },

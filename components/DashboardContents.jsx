@@ -42,32 +42,45 @@ const DashboardContents = ({ session }) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
+  const toDate = (value) => {
+    if (!value) return null;
+    if (typeof value.toDate === "function") return value.toDate();
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? null : date;
+  };
+
   const isSameDay = (date1, date2) =>
+    date1 &&
+    date2 &&
     date1.getFullYear() === date2.getFullYear() &&
     date1.getMonth() === date2.getMonth() &&
     date1.getDate() === date2.getDate();
 
   const filteredTasks = tasks.filter((task) =>
-    task.title.toLowerCase().includes(searchTerm.toLowerCase())
+    (task.title || "").toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const statusCounts = {
     todayCount: filteredTasks.filter(
       (t) =>
         t.status === "Pending" &&
-        isSameDay(new Date(t.due), today)
+        isSameDay(toDate(t.due), today)
     ).length,
     overdue: filteredTasks.filter((t) => {
       if (t.status !== "Pending" || !t.due) return false;
-      const taskDate = new Date(t.due);
+      const taskDate = toDate(t.due);
+      if (!taskDate) return false;
       taskDate.setHours(0, 0, 0, 0);
       return taskDate.getTime() < today.getTime();
     }).length,
     completed: filteredTasks.filter((t) => t.status === "Completed").length,
     pending: filteredTasks.filter((t) => t.status === "Pending").length,
     nextDue: filteredTasks
-      .filter((t) => t.status === "Pending" && new Date(t.due) >= today)
-      .sort((a, b) => new Date(a.due) - new Date(b.due))[0],
+      .filter((t) => {
+        const dueDate = toDate(t.due);
+        return t.status === "Pending" && dueDate && dueDate >= today;
+      })
+      .sort((a, b) => toDate(a.due) - toDate(b.due))[0],
   };
 
   return (
@@ -204,14 +217,14 @@ const DashboardContents = ({ session }) => {
                 <div>
                   <p className="text-gray-700 font-medium">{task.title}</p>
                   <p className="text-sm text-gray-500">
-                    {task.due ? task.due.toLocaleDateString() : "No deadline"}
+                    {toDate(task.due)?.toLocaleDateString() || "No deadline"}
                   </p>
                 </div>
                 <span
                   className={`text-sm font-medium px-2 py-1 rounded ${
                     task.status === "Completed"
                       ? "bg-green-100 text-green-700"
-                      : task.due && task.due < today
+                      : toDate(task.due) && toDate(task.due) < today
                       ? "bg-red-100 text-red-700"
                       : "bg-yellow-100 text-yellow-700"
                   }`}

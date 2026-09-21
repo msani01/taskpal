@@ -1,7 +1,7 @@
 // app/layout.tsx
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Providers } from "./providers"; // wrap SessionProvider here
+import Providers from "./providers";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 

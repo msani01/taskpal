@@ -6,6 +6,8 @@ import { FirestoreAdapter } from "@auth/firebase-adapter";
 import { cert } from "firebase-admin/app";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
+  trustHost: true,
   providers: [
     Google({
       clientId: process.env.AUTH_GOOGLE_ID,
@@ -26,6 +28,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
  
   pages: {
     signIn: "/auth/signin",
+  },
+  callbacks: {
+    async session({ session, user }) {
+      if (session.user && user?.id) {
+        session.user.id = user.id;
+      }
+      return session;
+    },
   },
 });
 
